@@ -7,7 +7,22 @@ import random as _random
 from collections import namedtuple as _namedtuple
 
 import spacy as _spacy
+from spacy.lang.da import Danish
+from spacy.lang.ar import Arabic
+from spacy.lang.ru import Russian
+
 from os import system as _system
+
+LANGUAGES = {
+    "ar": Arabic,
+    "da": Danish,
+    "ru": Russian,
+    "de": lambda: _spacy.load("de_core_news_sm"),
+    "en": lambda: _spacy.load("en_core_web_sm"),
+    "fr": lambda: _spacy.load("fr_core_news_sm"),
+    "es": lambda: _spacy.load("es_core_news_sm"),
+    "it": lambda: _spacy.load("it_core_news_sm")
+}
 
 ################################################################################
 
@@ -16,22 +31,21 @@ class Fragments(object):
     Match = _namedtuple("Match", ("summary", "text", "length"))
 
     @classmethod
-    def _load_model(cls):
+    def _load_model(cls, lang):
+        if not hasattr(cls, "_nlp"):
+            language = LANGUAGES.get(lang)
+            if not language:
+                # language not installed/supported
+                err_msg = "Couldn't recognize language model: '%s'. " % lang
+                err_msg += "You might have to download a model. For english run\n"
+                err_msg += "\tpython -m spacy download en_core_web_sm" 
+                raise ModuleNotFoundError(err_msg)
 
-        if not hasattr(cls, "_en"):
+            cls._nlp = language()  # it's a callback
 
-            try:
+    def __init__(self, summary, text, lang, tokenize = True, case = False):
 
-                cls._en = _spacy.load("en_core_web_sm")
-
-            except:
-
-                _system("python -m spacy download en_core_web_sm")
-                cls._en = _spacy.load("en_core_web_sm")
-
-    def __init__(self, summary, text, tokenize = True, case = False):
-
-        self._load_model()
+        self._load_model(lang)
 
         self._tokens = tokenize
 
@@ -53,7 +67,7 @@ class Fragments(object):
 
         """
 
-        return self._en(text, disable = ["tagger", "parser", "ner", "textcat"])
+        return self._nlp(text, disable = ["tagger", "parser", "ner", "textcat"])
 
 
     def _normalize(self, tokens, case = False):

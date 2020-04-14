@@ -88,9 +88,14 @@ def binner(value, cutoffs, levels):
     help = "Items processed between updates. [default = 20*CPUs]",
 )
 
+@click.option(
+    "--lang",
+    required=True
+)
+
 ################################################################################
 
-def main(archive, urldiff, dataset, workers, chunksize):
+def main(archive, urldiff, dataset, workers, chunksize, lang):
 
     if archive is None and urldiff is None:
 
@@ -179,10 +184,9 @@ def main(archive, urldiff, dataset, workers, chunksize):
                         # Compute statistics.
 
                         for result in results:
-
                             if result["text"] is None or result["summary"] is None: continue
 
-                            fragments = Fragments(result["summary"], result["text"])
+                            fragments = Fragments(result["summary"], result["text"], lang=lang)
 
                             result["density"] = fragments.density()
                             result["coverage"] = fragments.coverage()
