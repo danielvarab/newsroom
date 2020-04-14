@@ -136,7 +136,7 @@ class Article(object):
 
         if self.html.strip() == "":
 
-            raise Exception("No page content?")
+            raise ValueError("No page content?")
 
         # The document has content. Create:
         # - A Readability parse object to extract the text
@@ -214,7 +214,8 @@ class Article(object):
 
         try:
             return Article(url, html).serialize()
-        except:
+        except Exception as exception:
+            print(f"Error while processing: {url}")
             return None
 
 
