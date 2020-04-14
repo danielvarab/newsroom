@@ -24,7 +24,9 @@ class Article(object):
         self.archive = archive
         self.html    = html if html is not None else ""
 
-        self._parse_archive()
+        # self._parse_archive()
+        self.url = archive
+        self.date = None
         self._parse_html()
 
 
