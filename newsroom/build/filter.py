@@ -19,12 +19,13 @@ class Article(object):
 
     """
 
-    def __init__(self, archive, html):
+    def __init__(self, archive, html, parse_archive):
 
         self.archive = archive
         self.html    = html if html is not None else ""
 
-        # self._parse_archive()
+        if parse_archive:
+            self._parse_archive()
         self.url = archive
         self.date = None
         self._parse_html()
@@ -213,7 +214,7 @@ class Article(object):
         if html is None: html = ""
 
         try:
-            return Article(url, html).serialize()
+            return Article(url, html, parse_archive=False).serialize()
         except Exception as exception:
             print(f"Error while processing: {url}")
             return None
