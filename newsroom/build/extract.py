@@ -177,14 +177,14 @@ def main(archive, urldiff, dataset, workers, chunksize, lang):
                 def process_chunk():
 
                     with ProcessPoolExecutor(workers) as ex:
-
                         results = list(ex.map(Article.process, chunk))
                         results = [r for r in results if r is not None]
 
                         # Compute statistics.
 
                         for result in results:
-                            if result["text"] or result["summary"] is None: continue
+                            if (result["text"] is None) or (result["summary"] is None):
+                                continue
                             # this compared to the original impl.
                             # should skip empty summaries or bodies
                             # if not result["text"] or not result["summary"]:
